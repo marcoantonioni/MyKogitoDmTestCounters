@@ -22,6 +22,7 @@ quarkus ext add quarkus-resteasy-jackson
 quarkus ext add io.quarkus:quarkus-smallrye-openapi
 quarkus ext add io.quarkus:quarkus-smallrye-health
 
+# in pom.xml
     <dependency>
       <groupId>org.kie.kogito</groupId>
       <artifactId>monitoring-prometheus-quarkus-addon</artifactId>
