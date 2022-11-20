@@ -1,5 +1,109 @@
 # MyKogitoDmTestCounters Project
 
+## Notes
+
+```
+GROUP_ID=marco.demos.kogito
+APP_NAME=MyKogitoDmTestCounters
+
+RH_QM_PLUGIN_VER="2.7.6.Final-redhat-00009"
+PRJ_GROUP=marco.demos.kogito
+APP_NAME=MyKogitoDmTestCounters
+
+mvn com.redhat.quarkus.platform:quarkus-maven-plugin:${RH_QM_PLUGIN_VER}:create \
+	-DprojectGroupId=${PRJ_GROUP} \
+	-DprojectArtifactId=${APP_NAME} \
+	-DplatformGroupId=com.redhat.quarkus.platform \
+	-DplatformVersion=${RH_QM_PLUGIN_VER}
+
+cd ${APP_NAME}
+quarkus ext add org.kie.kogito:kogito-quarkus
+quarkus ext add quarkus-resteasy-jackson
+quarkus ext add io.quarkus:quarkus-smallrye-openapi
+quarkus ext add io.quarkus:quarkus-smallrye-health
+
+    <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>monitoring-prometheus-quarkus-addon</artifactId>
+    </dependency>
+
+# in application.properties
+	quarkus.devservices.enabled=false
+```
+
+## OCP Prometheus
+
+```
+TNS=my-kogito-dm-test-counters
+MONITORED_APP_NAME=my-kogito-dm-test-counters
+SM_NAME=monitor-${MONITORED_APP_NAME}
+
+
+cat <<EOF | oc apply -f -
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: ${SM_NAME}
+  name: ${SM_NAME}
+  namespace: ${TNS}
+spec:
+  endpoints:
+  - interval: 15s
+    port: http
+    targetPort: 8080
+    path: /q/metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - ${TNS}
+  selector:
+    matchLabels:
+      app: ${MONITORED_APP_NAME}
+EOF
+
+
+
+cat <<EOF | oc apply -f -
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: ${SM_NAME}
+  name: ${SM_NAME}
+  namespace: ${TNS}
+spec:
+  endpoints:
+  - interval: 15s
+    port: http
+    targetPort: 8080
+    path: /q/metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - ${TNS}
+  selector:
+    matchLabels:
+      app: ${MONITORED_APP_NAME}
+EOF
+
+
+cat <<EOF | oc apply -f -
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus
+  namespace: ${TNS}
+spec:
+  serviceAccountName: prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      app: ${MONITORED_APP_NAME}
+EOF
+```
+
+
+# Useful
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
