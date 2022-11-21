@@ -35,34 +35,9 @@ quarkus ext add io.quarkus:quarkus-smallrye-health
 ## OCP Prometheus
 
 ```
-TNS=my-kogito-dm-test-counters
+TNS=my-dm-counters
 MONITORED_APP_NAME=my-kogito-dm-test-counters
 SM_NAME=monitor-${MONITORED_APP_NAME}
-
-
-cat <<EOF | oc apply -f -
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app: ${SM_NAME}
-  name: ${SM_NAME}
-  namespace: ${TNS}
-spec:
-  endpoints:
-  - interval: 15s
-    port: http
-    targetPort: 8080
-    path: /q/metrics
-    scheme: http
-  namespaceSelector:
-    matchNames:
-    - ${TNS}
-  selector:
-    matchLabels:
-      app: ${MONITORED_APP_NAME}
-EOF
-
 
 
 cat <<EOF | oc apply -f -
@@ -204,6 +179,18 @@ EOF
   ]
 }
 ```
+
+### Example of Prometheus metrics
+
+
+- quantiles
+api_execution_elapsed_seconds{artifactId="MyKogitoDmTestCounters"}
+
+- rules executed in time frame
+increase(api_http_response_code_total{artifactId="MyKogitoDmTestCounters"}[1m])
+
+
+
 
 # Useful
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
