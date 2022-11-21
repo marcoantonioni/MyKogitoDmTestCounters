@@ -183,12 +183,17 @@ EOF
 ### Example of Prometheus metrics
 
 
-- quantiles
+#### quantiles
+
+```
 api_execution_elapsed_seconds{artifactId="MyKogitoDmTestCounters"}
+```
 
-- rules executed in time frame
+#### rules executed in time frame
+
+```
 increase(api_http_response_code_total{artifactId="MyKogitoDmTestCounters"}[1m])
-
+```
 
 
 
